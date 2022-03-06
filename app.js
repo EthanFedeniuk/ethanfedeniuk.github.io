@@ -1,5 +1,4 @@
 (function() {
-  // Initialize Firebase
   var config = {
     apiKey: "AIzaSyCvOUqQPRbo7rJPtunQnV23jjfN3v73Ee4",
     authDomain: "iwantthesegames-a724e.firebaseapp.com",
@@ -9,97 +8,102 @@
   firebase.initializeApp(config);
 }());
 
+const BOARD_GAMES = 'board-games';
+const SWITCH_GAMES = 'switch-games';
+const PS4_GAMES = 'ps4-games'
+
+var activeCategory = BOARD_GAMES;
+
+const localization = {
+    'board-games': {
+        platform: 'Board Game',
+        header: 'I want these board games'
+    },
+    'switch-games': {
+        platform: 'Nintendo Switch',
+        header: 'I want these Switch games'
+    },
+    'ps4-games': {
+        platform: 'PS4',
+        header: 'I want these PS4 games'
+    }
+}
+
 $(document).ready(function() {
 
-    // Default: Show board-games; hide others
-    update('board-games');
+    var tblGames = $('#tbl-games').DataTable({
+        columnDefs: [
+            { width: '80%', targets: 0 },
+            { width: '20%', targets: 1 },
+            { width: '10%', targets: 2 }
+        ]
+    });
 
     var db = firebase.database();
+    var query = db.ref('games/v2games');
+    query.once('value', function(games) {
+        const gameList = games.val();
 
-    loadBoardGameData(db.ref('games/wantedBoardGames'), 'wantedBoardGames');
-    loadBoardGameData(db.ref('games/ownedBoardGames'), 'ownedBoardGames');
-    loadVideoGameData(db.ref('games/wantedPs4Games'), 'wantedPs4Games');
-    loadVideoGameData(db.ref('games/ownedPs4Games'), 'ownedPs4Games');
-    loadVideoGameData(db.ref('games/wantedSwitchGames'), 'wantedSwitchGames');
-    loadVideoGameData(db.ref('games/ownedSwitchGames'), 'ownedSwitchGames');
+        // Table View
+        gameList.forEach((game) => {
+            const isOwned = (!!game.owned ? 'Yes' : 'No');
+            const data = [game.title, localization[game.platform].platform, isOwned];
+            tblGames.rows.add([data]).draw();
+        });
+
+        // List Views
+        loadListView(gameList, BOARD_GAMES);
+        loadListView(gameList, SWITCH_GAMES);
+        loadListView(gameList, PS4_GAMES);
+    });
+
+    $('#btn-v1').click(() => {
+        updateAccordions(activeCategory);
+
+        $('.table-view').hide();
+        $('.list-view').show();
+        $('#btn-v1').toggleClass('active', true);
+        $('#btn-v2').toggleClass('active', false);
+    });
+
+    $('#btn-v2').click(() => {
+        $('.table-view').show();
+        $('.list-view').hide();
+        $('#btn-v1').toggleClass('active', false);
+        $('#btn-v2').toggleClass('active', true);
+        $('#header').text('I want these games');
+    });
 
     $(".accordion").click(function() {
         $(this).toggleClass("active");
 
-        /* Toggle between hiding and showing the active panel */
+        const isActive = $(this).hasClass('active');
         var panel = $(this).next();
-        if (panel.css("display") === "table") {
-            panel.hide();
-        } else {
-            panel.css("display", "table");
-        }
+        panel.toggleClass('active', isActive);
     });
 });
 
-function addNewBoardGame(tableID, game) {
-    var table = $("#" + tableID);
-    var tr = $("<tr></tr>");
-    
-    // Title
-    var td = $("<td></td>").text(game.title);
-    tr.append(td);
-
-    // NumPlayers
-    td = $("<td></td>").text(game.numPlayers);
-    tr.append(td);
-
-    // Duration
-    td = $("<td></td>").text(game.duration);
-    tr.append(td);
-
-    table.append(tr);
+function updateAccordions(categoryId) {
+    activeCategory = categoryId;
+    $('.game-category').toggleClass('active', false);
+    $('.category-' + categoryId).addClass('active');
+    $('.game-accordion').hide();
+    $('.' + categoryId).show();
+    $('#header').text(localization[categoryId].header);
 }
 
-function addNewVideoGame(tableID, game) {
-    var table = $("#" + tableID);
-    var tr = $("<tr></tr>");
-    
-    // Title
-    var td = $("<td></td>").text(game.title);
-    tr.append(td);
+function loadListView(games, categoryId) {
+    games.filter(game => game.platform === categoryId)
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .forEach((game) => {
+            const tr = $("<tr></tr>");
+            const td = $("<td></td>").text(game.title);
+            tr.append(td);
 
-    table.append(tr);
-}
-
-function update(categoryID) {
-    if (categoryID === "board-games") {
-        $('.board-games').show();
-        $('.ps4-games').hide();
-        $('.switch-games').hide();
-        $("#header").text("I want these board games");
-    } else if (categoryID === "ps4-games") {
-        $('.board-games').hide();
-        $('.switch-games').hide();
-        $('.ps4-games').show();
-        $("#header").text("I want these PS4 games");
-    } else if (categoryID === "switch-games") {
-        $('.board-games').hide();
-        $('.ps4-games').hide();
-        $('.switch-games').show();
-        if (ownedSwitchGames.length === 0) {
-            $('.owned.switch-games').hide();
-        }
-        $("#header").text("I want these Switch games");
-    }
-}
-
-function loadBoardGameData(ref, table) {
-    ref.once('value', function(games) {
-        games.forEach(function(game) {
-            addNewBoardGame(table, game.val());
-        })
-    });
-}
-
-function loadVideoGameData(ref, table) {
-    ref.once('value', function(games) {
-        games.forEach(function(game) {
-            addNewVideoGame(table, game.val());
-        })
-    });
+            if (game.owned) {
+                $('.owned.' + categoryId + ' table').append(tr);
+            } else {
+                $('.wanted.' + categoryId + ' table').append(tr);
+            }
+        });
 }

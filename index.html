@@ -2,108 +2,127 @@
 <html>
 
 <head>
-	<title>I want these these games</title>
+    <title>I want these these games</title>
 
-	<link rel="stylesheet" href="./style.css">
-	<link rel="stylesheet" type="text/css" href="https://petalcdn.shakr.com/edge/petal.min.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" type="text/css" href="https://petalcdn.shakr.com/edge/petal.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
 
-	<script src="https://www.gstatic.com/firebasejs/5.6.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase.js"></script>
+    <script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
 
-	<script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
-	<script src="app.js"></script>
+    <script src="app.js"></script>
 </head>
 
 <body>
-	<div class="container">
-		<div class="row">
-			<div class="title col-1">
-				<h1 id="header">I want these games</h1>
-			</div>
-		</div>
+    <div class="btn-group btn-group-segmented">
+        <button class="btn hollow btn-table active" id="btn-v2" href="#">Table View</button>
+        <button class="btn hollow btn-view" id="btn-v1" href="#">List View</button>
+    </div>
+    <div class="container">
+        <h1 id="header" class="title">I want these games</h1>
 
-		<div class="row">
-			<div class="col-3">
-			  	<h3>Categories</h3>
-			  	<button class="btn" id="board-games" onClick="update(this.id)" href="#">Board Games</button>
-			  	<br/>
-			  	<br/>
-			  	<button class="btn" id="ps4-games" onClick="update(this.id)" href="#">PS4 Games</button>
-				<br/>
-			  	<br/>
-			  	<button class="btn" id="switch-games" onClick="update(this.id)" href="#">Nintendo Switch Games</button>
-			</div>
+        <div class="table-view">
+            <table id="tbl-games" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Platform</th>
+                        <th>Already Owned</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
 
-			<div class="col-3 colspan-2">
-				<div class="wanted board-games">
-					<button class="accordion">Games I want</button>
-					<table id="wantedBoardGames" class="table panel">
-					    <thead>
-					        <tr>
-					            <th>Title</th>
-					            <th># Of Players</th>
-					            <th>Duration (Minutes)</th>
-					        </tr>
-					    </thead>
-					</table>
-				</div>
-				<div class="wanted ps4-games">
-					<button class="accordion">Games I want</button>
-					<table id="wantedPs4Games" class="table panel">
-					    <thead>
-					        <tr>
-					            <th>Title</th>
-					        </tr>
-					    </thead>
-					</table>
-				</div>
-				<div class="wanted switch-games">
-					<button class="accordion">Games I want</button>
-					<table id="wantedSwitchGames" class="table panel">
-					    <thead>
-					        <tr>
-					            <th>Title</th>
-					        </tr>
-					    </thead>
-					</table>
-				</div>
-				<div class="row">
-					<div style="color: black; width:100%; height:30px;" class="col-1"></div> 
-				</div>
-				<div class="owned board-games">
-					<button class="accordion">Games I own</button>
-					<table id="ownedBoardGames" class="table panel">
-					    <thead>
-					        <tr>
-					            <th>Title</th>
-					            <th># Of Players</th>
-					            <th>Duration (Minutes)</th>
-					        </tr>
-					    </thead>
-					</table>
-				</div>
-				<div class="owned ps4-games">
-					<button class="accordion">Games I own</button>
-					<table id="ownedPs4Games" class="table panel">
-					    <thead>
-					        <tr>
-					            <th>Title</th>
-					        </tr>
-					    </thead>
-					</table>
-				</div>
-				<div class="owned switch-games">
-					<button class="accordion">Games I own</button>
-					<table id="ownedSwitchGames" class="table panel">
-					    <thead>
-					        <tr>
-					            <th>Title</th>
-					        </tr>
-					    </thead>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+        <div class="row list-view" style="display: none">
+            <div class="col-3">
+                <h3>Categories</h3>
+                <button class="btn hollow game-category category-board-games"onClick="updateAccordions(BOARD_GAMES)" href="#">Board Games</button>
+                <br/>
+                <br/>
+                <button class="btn hollow game-category category-switch-games" onClick="updateAccordions(SWITCH_GAMES)" href="#">Nintendo Switch Games</button>
+                <br/>
+                <br/>
+                <button class="btn hollow game-category category-ps4-games" onClick="updateAccordions(PS4_GAMES)" href="#">PS4 Games</button>
+            </div>
+
+            <div class="col-3 colspan-2">
+                <div class="wanted board-games game-accordion">
+                    <button class="accordion">Games I want</button>
+                    <div class="list-container">
+                        <table id="wantedBoardGames" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="owned board-games game-accordion">
+                    <button class="accordion">Games I own</button>
+                    <div class="list-container">
+                        <table id="ownedBoardGames" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="wanted ps4-games game-accordion">
+                    <button class="accordion">Games I want</button>
+                    <div class="list-container">
+                        <table id="wantedPs4Games" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="owned ps4-games game-accordion">
+                    <button class="accordion">Games I own</button>
+                    <div class="list-container">
+                        <table id="ownedPs4Games" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="wanted switch-games game-accordion">
+                    <button class="accordion">Games I want</button>
+                    <div class="list-container">
+                        <table id="wantedSwitchGames" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="owned switch-games game-accordion">
+                    <button class="accordion">Games I own</button>
+                    <div class="list-container">
+                        <table id="ownedSwitchGames" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
