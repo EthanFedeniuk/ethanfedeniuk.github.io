@@ -74,6 +74,11 @@ $(document).ready(function() {
         $('#header').text('I want these games');
     });
 
+    $('.nav-item').click(function() {
+        $('.nav-item').find('.nav-link').removeClass('active');
+        $(this).find('.nav-link').addClass('active');
+    });
+
     $(".accordion").click(function() {
         $(this).toggleClass("active");
 

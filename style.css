@@ -18,12 +18,9 @@ button.accordion:hover {
     overflow: hidden;
 }
 
-h1 {
-    text-align: center;
-}
-
 .list-container.active {
     max-height: 2000px;
+    transition: max-height 0.5s ease-out;
 }
 
 .list-container:not(.active) {
