@@ -10,7 +10,6 @@
 
 const BOARD_GAMES = 'board-games';
 const SWITCH_GAMES = 'switch-games';
-const PS4_GAMES = 'ps4-games'
 
 const localization = {
     'board-games': {
@@ -20,10 +19,6 @@ const localization = {
     'switch-games': {
         platform: 'Nintendo Switch',
         header: 'I want these Switch games'
-    },
-    'ps4-games': {
-        platform: 'PS4',
-        header: 'I want these PS4 games'
     }
 }
 
@@ -45,7 +40,7 @@ $(document).ready(function() {
         // Table View
         gameList.forEach((game) => {
             const isOwned = (game.owned ? 'Yes' : 'No');
-            const data = [game.title, localization[game.platform].platform, isOwned];
+            const data = [game.title, localization[game.platform]?.platform ?? 'Unknown', isOwned];
             tblGames.rows.add([data]);
         });
         tblGames.draw();
@@ -53,7 +48,6 @@ $(document).ready(function() {
         // List Views
         loadListView(gameList, BOARD_GAMES);
         loadListView(gameList, SWITCH_GAMES);
-        loadListView(gameList, PS4_GAMES);
     });
 
     $('#btn-list-view').click(() => {
