@@ -4,126 +4,154 @@
 <head>
     <title>I want these these games</title>
 
-    <link rel="stylesheet" href="./style.css">
+    <script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase.js"></script>
 
-    <link rel="stylesheet"  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-
-    <script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase.js"></script>
+    <link rel="stylesheet" href="./style.css">
     <script src="app.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-            <a class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                <span id="header" class="fs-4">I want these games</span>
-            </a>
-            <ul class="nav nav-pills">
-                <li id="btn-v2" class="nav-item"><a href="#" class="nav-link active">Table View</a></li>
-                <li id="btn-v1" class="nav-item"><a href="#" class="nav-link">List View</a></li>
-            </ul>
-        </header>
-
-        <div class="table-view">
-            <table id="tbl-games" class="table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Platform</th>
-                        <th>Already Owned</th>
-                    </tr>
-                </thead>
-            </table>
+        <div class="nav nav-tabs pt-4" id="myTab" role="tablist">
+            <h1 class="me-md-auto">
+                I want these games
+            </h1>
+            <button class="nav-link active" id="table-view-tab" data-bs-toggle="tab" data-bs-target="#table-view" type="button" role="tab" aria-controls="table-view" aria-selected="true">Table View</button>
+            <button class="nav-link" id="list-view-tab" data-bs-toggle="tab" data-bs-target="#list-view" type="button" role="tab" aria-controls="list-view" aria-selected="false">List View</button>
         </div>
 
-        <div class="row list-view" style="display: none">
-            <div class="col-3">
-                <h3>Categories</h3>
-                <button class="btn hollow game-category category-board-games"onClick="updateAccordions(BOARD_GAMES)" href="#">Board Games</button>
-                <br/>
-                <br/>
-                <button class="btn hollow game-category category-switch-games" onClick="updateAccordions(SWITCH_GAMES)" href="#">Nintendo Switch Games</button>
-                <br/>
-                <br/>
-                <button class="btn hollow game-category category-ps4-games" onClick="updateAccordions(PS4_GAMES)" href="#">PS4 Games</button>
+        <div class="tab-content mt-4">
+            <div id="table-view" class="table-view tab-pane fade show active" role="tabpanel">
+                <table id="tbl-games" class="table w-100">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Platform</th>
+                            <th>Already Owned</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
 
-            <div class="col-9">
-                <div class="wanted board-games game-accordion">
-                    <button class="accordion">Games I want</button>
-                    <div class="list-container">
-                        <table id="wantedBoardGames" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                </tr>
-                            </thead>
-                        </table>
+            <div id="list-view" class="list-view tab-pane fade" role="tabpanel">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="btn-group-vertical w-100" role="group" aria-label="Vertical radio toggle button group">
+                            <input type="radio" class="btn-check game-category category-board-games" name="vbtn-radio" id="vbtn-radio1" autocomplete="off" checked="" onClick="updateAccordions(BOARD_GAMES)">
+                            <label class="btn btn-outline-primary" for="vbtn-radio1">Board Games</label>
+
+                            <input type="radio" class="btn-check game-category category-switch-games" name="vbtn-radio" id="vbtn-radio2" autocomplete="off" onClick="updateAccordions(SWITCH_GAMES)">
+                            <label class="btn btn-outline-primary" for="vbtn-radio2">Nintendo Switch Games</label>
+
+                            <input type="radio" class="btn-check game-category category-ps4-games" name="vbtn-radio" id="vbtn-radio3" autocomplete="off" onClick="updateAccordions(PS4_GAMES)">
+                            <label class="btn btn-outline-primary" for="vbtn-radio3">PS4 Games</label>
+                          </div>
                     </div>
-                </div>
-                <div class="owned board-games game-accordion">
-                    <button class="accordion">Games I own</button>
-                    <div class="list-container">
-                        <table id="ownedBoardGames" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-                <div class="wanted ps4-games game-accordion">
-                    <button class="accordion">Games I want</button>
-                    <div class="list-container">
-                        <table id="wantedPs4Games" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-                <div class="owned ps4-games game-accordion">
-                    <button class="accordion">Games I own</button>
-                    <div class="list-container">
-                        <table id="ownedPs4Games" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-                <div class="wanted switch-games game-accordion">
-                    <button class="accordion">Games I want</button>
-                    <div class="list-container">
-                        <table id="wantedSwitchGames" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-                <div class="owned switch-games game-accordion">
-                    <button class="accordion">Games I own</button>
-                    <div class="list-container">
-                        <table id="ownedSwitchGames" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                </tr>
-                            </thead>
-                        </table>
+
+                    <div class="col-9">
+                        <div class="accordion board-games">
+                            <div class="accordion-item wanted">
+                                <h2 class="accordion-header" id="wanted-board-games-heading">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#wanted-board-games-collapse" aria-controls="wanted-board-games-collapse">
+                                        Games I Want
+                                    </button>
+                                </h2>
+                                <div id="wanted-board-games-collapse" class="accordion-collapse collapse show" aria-labelledby="wanted-board-games-heading">
+                                    <div class="accordion-body">
+                                        <table id="tbl-wanted-board-games" class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item owned">
+                                <h2 class="accordion-header" id="owned-board-games-heading">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#owned-board-games-collapse" aria-controls="owned-board-games-collapse">
+                                        Games I Own
+                                    </button>
+                                </h2>
+                                <div id="owned-board-games-collapse" class="accordion-collapse collapse" aria-labelledby="owned-board-games-heading">
+                                    <div class="accordion-body">
+                                        <table id="tbl-owned-board-games" class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion ps4-games d-none">
+                            <div class="accordion-item owned d-none">
+                                <h2 class="accordion-header" id="owned-ps4-games-heading">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#owned-ps4-games-collapse" aria-controls="owned-ps4-games-collapse">
+                                        Games I Own
+                                    </button>
+                                </h2>
+                                <div id="owned-ps4-games-collapse" class="accordion-collapse collapse" aria-labelledby="owned-ps4-games-heading">
+                                    <div class="accordion-body">
+                                        <table id="tbl-owned-ps4-games" class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion switch-games d-none">
+                            <div class="accordion-item wanted">
+                                <h2 class="accordion-header" id="wanted-switch-games-heading">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#wanted-switch-games-collapse" aria-controls="wanted-switch-games-collapse">
+                                        Games I Want
+                                    </button>
+                                </h2>
+                                <div id="wanted-switch-games-collapse" class="accordion-collapse collapse show" aria-labelledby="wanted-switch-games-heading">
+                                    <div class="accordion-body">
+                                        <table id="tbl-wanted-switch-games" class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item owned">
+                                <h2 class="accordion-header" id="owned-switch-games-heading">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#owned-switch-games-collapse" aria-controls="owned-switch-games-collapse">
+                                        Games I Own
+                                    </button>
+                                </h2>
+                                <div id="owned-switch-games-collapse" class="accordion-collapse collapse" aria-labelledby="owned-switch-games-heading">
+                                    <div class="accordion-body">
+                                        <table id="tbl-owned-switch-games" class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,18 +1,16 @@
 (function() {
-  var config = {
-    apiKey: "AIzaSyCvOUqQPRbo7rJPtunQnV23jjfN3v73Ee4",
-    authDomain: "iwantthesegames-a724e.firebaseapp.com",
-    databaseURL: "https://iwantthesegames-a724e.firebaseio.com",
-    storageBucket: "iwantthesegames-a724e.appspot.com"
-  };
-  firebase.initializeApp(config);
+    const config = {
+        apiKey: "AIzaSyCvOUqQPRbo7rJPtunQnV23jjfN3v73Ee4",
+        authDomain: "iwantthesegames-a724e.firebaseapp.com",
+        databaseURL: "https://iwantthesegames-a724e.firebaseio.com",
+        storageBucket: "iwantthesegames-a724e.appspot.com"
+    };
+    firebase.initializeApp(config);
 }());
 
 const BOARD_GAMES = 'board-games';
 const SWITCH_GAMES = 'switch-games';
 const PS4_GAMES = 'ps4-games'
-
-var activeCategory = BOARD_GAMES;
 
 const localization = {
     'board-games': {
@@ -30,7 +28,6 @@ const localization = {
 }
 
 $(document).ready(function() {
-
     var tblGames = $('#tbl-games').DataTable({
         columnDefs: [
             { width: '80%', targets: 0 },
@@ -40,16 +37,18 @@ $(document).ready(function() {
     });
 
     var db = firebase.database();
-    var query = db.ref('games/v2games');
+    var query = db.ref('games');
+
     query.once('value', function(games) {
         const gameList = games.val();
 
         // Table View
         gameList.forEach((game) => {
-            const isOwned = (!!game.owned ? 'Yes' : 'No');
+            const isOwned = (game.owned ? 'Yes' : 'No');
             const data = [game.title, localization[game.platform].platform, isOwned];
-            tblGames.rows.add([data]).draw();
+            tblGames.rows.add([data]);
         });
+        tblGames.draw();
 
         // List Views
         loadListView(gameList, BOARD_GAMES);
@@ -57,58 +56,64 @@ $(document).ready(function() {
         loadListView(gameList, PS4_GAMES);
     });
 
-    $('#btn-v1').click(() => {
-        updateAccordions(activeCategory);
-
+    $('#btn-list-view').click(() => {
         $('.table-view').hide();
         $('.list-view').show();
-        $('#btn-v1').toggleClass('active', true);
-        $('#btn-v2').toggleClass('active', false);
+        $('#btn-table-view').toggleClass('active', true);
+        $('#btn-list-view').toggleClass('active', false);
     });
 
-    $('#btn-v2').click(() => {
+    $('#btn-table-view').click(() => {
         $('.table-view').show();
         $('.list-view').hide();
-        $('#btn-v1').toggleClass('active', false);
-        $('#btn-v2').toggleClass('active', true);
-        $('#header').text('I want these games');
+        $('#btn-table-view').toggleClass('active', false);
+        $('#btn-list-view').toggleClass('active', true);
     });
 
     $('.nav-item').click(function() {
         $('.nav-item').find('.nav-link').removeClass('active');
         $(this).find('.nav-link').addClass('active');
     });
-
-    $(".accordion").click(function() {
-        $(this).toggleClass("active");
-
-        const isActive = $(this).hasClass('active');
-        var panel = $(this).next();
-        panel.toggleClass('active', isActive);
-    });
 });
 
 function updateAccordions(categoryId) {
-    activeCategory = categoryId;
-    $('.game-category').toggleClass('active', false);
-    $('.category-' + categoryId).addClass('active');
-    $('.game-accordion').hide();
-    $('.' + categoryId).show();
-    $('#header').text(localization[categoryId].header);
+    // Update Category
+    $('.btn-check.category-' + categoryId).prop('checked', true);
+
+    // Hide all accordions, then reveal the selected one
+    $('.accordion').toggleClass('d-none', true);
+    $('.accordion.' + categoryId).toggleClass('d-none', false);
 }
 
-function loadListView(games, categoryId) {
-    games.filter(game => game.platform === categoryId)
-        .sort((a, b) => a.title.localeCompare(b.title))
+function appendToList(games, accordionSelector) {
+    [...games].sort((a, b) => a.title.localeCompare(b.title))
         .forEach((game) => {
             const tr = $("<tr></tr>");
             const td = $("<td></td>").text(game.title);
             tr.append(td);
 
-            if (game.owned) {
-                $('.owned.' + categoryId + ' table').append(tr);
-            } else {
-                $('.wanted.' + categoryId + ' table').append(tr);
-            }
+            const table = $(accordionSelector).find('.accordion-body > table');
+            table.append(tr);
         });
+}
+
+function loadListView(games, categoryId) {
+    const categoryGames = games.filter(game => game.platform === categoryId);
+
+    if (categoryGames.length === 0) return;
+
+    const ownedGames = categoryGames.filter((game) => game.owned);
+    const wantedGames = categoryGames.filter((game) => !game.owned);
+
+    if (ownedGames.length > 0) {
+        const accordionSelector = `.accordion.${categoryId} > .accordion-item.owned`;
+        $(accordionSelector).toggleClass('d-none', false);
+        appendToList(ownedGames, accordionSelector);
+    }
+
+    if (wantedGames.length > 0) {
+        const accordionSelector = `.accordion.${categoryId} > .accordion-item.wanted`;
+        $(accordionSelector).toggleClass('d-none', false);
+        appendToList(wantedGames, accordionSelector);
+    }
 }
